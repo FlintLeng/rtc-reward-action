@@ -1,0 +1,32 @@
+name: 'RTC Reward Action'
+description: 'Automatically award RTC tokens when a pull request is merged'
+author: 'FlintLeng'
+branding:
+  icon: 'award'
+  color: 'purple'
+inputs:
+  node-url:
+    description: 'RustChain node URL'
+    required: true
+    default: 'https://50.28.86.131'
+  amount:
+    description: 'Amount of RTC to award per merge'
+    required: true
+    default: '5'
+  wallet-from:
+    description: 'Sender wallet name'
+    required: true
+  admin-key:
+    description: 'Admin secret key for signing transactions'
+    required: true
+  dry-run:
+    description: 'Run in dry-run mode (no actual transactions)'
+    required: false
+    default: 'false'
+  github-token:
+    description: 'GitHub token for posting comments'
+    required: true
+    default: '${{ github.token }}'
+runs:
+  using: 'python3'
+  main: 'src/reward.py'
