@@ -1,32 +1,53 @@
 name: 'RTC Reward Action'
-description: 'Automatically award RTC tokens when a pull request is merged'
+description: 'Automatically award RTC tokens when a PR is merged. Turns any repo into a bounty platform.'
 author: 'FlintLeng'
 branding:
   icon: 'award'
   color: 'purple'
+
 inputs:
   node-url:
     description: 'RustChain node URL'
-    required: true
+    required: false
     default: 'https://50.28.86.131'
   amount:
-    description: 'Amount of RTC to award per merge'
-    required: true
+    description: 'Amount of RTC to award per merged PR'
+    required: false
     default: '5'
   wallet-from:
-    description: 'Sender wallet name'
+    description: 'Source wallet name to send RTC from'
     required: true
   admin-key:
-    description: 'Admin secret key for signing transactions'
+    description: 'Admin key for the source wallet (store as a secret!)'
     required: true
   dry-run:
-    description: 'Run in dry-run mode (no actual transactions)'
+    description: 'If true, simulate without sending actual RTC (default: false)'
     required: false
     default: 'false'
   github-token:
-    description: 'GitHub token for posting comments'
-    required: true
+    description: 'GitHub token for posting PR comments (use ${{ secrets.GITHUB_TOKEN }})'
+    required: false
     default: '${{ github.token }}'
+  fallback-wallet:
+    description: 'Fallback wallet if no wallet found in PR body or .rtc-wallet file'
+    required: false
+    default: ''
+  min-balance:
+    description: 'Minimum balance required in source wallet to send (default: amount+1)'
+    required: false
+    default: ''
+
+outputs:
+  recipient-wallet:
+    description: 'The wallet that received (or would receive) RTC'
+    value: ${{ steps.reward.outputs.recipient_wallet }}
+  tx-id:
+    description: 'Transaction ID of the RTC transfer (empty in dry-run)'
+    value: ${{ steps.reward.outputs.tx_id }}
+  amount-sent:
+    description: 'Amount of RTC sent'
+    value: ${{ steps.reward.outputs.amount_sent }}
+
 runs:
   using: 'python3'
   main: 'src/reward.py'
