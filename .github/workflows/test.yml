@@ -1,0 +1,45 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [main, v2]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pytest pytest-mock responses
+
+      - name: Run unit tests
+        run: pytest tests/ -v
+
+      - name: Lint
+        run: |
+          python -m py_compile src/reward.py
+          echo "Syntax OK"
+
+  dry-run-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dry-run integration test
+        uses: ./
+        with:
+          node-url: https://50.28.86.131
+          amount: 1
+          wallet-from: test-sender
+          admin-key: dummy-key-for-test
+          dry-run: true
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fallback-wallet: test-contributor
